@@ -1,0 +1,167 @@
+@import "tailwindcss";
+
+/* Light is the default; sepia and dark apply via html[data-theme], and the
+   "system" theme (no attribute) follows the OS color scheme. */
+:root {
+  color-scheme: light;
+  --bg: #ecebe6;
+  --chrome: #f7f6f2;
+  --paper: #fdfcf8;
+  --ink: #1f1d1a;
+  --muted: #6c675e;
+  --line: rgb(31 29 26 / 0.12);
+  --accent: #8a5a2b;
+  --shade: rgb(0 0 0 / 0.28);
+}
+
+:root[data-theme="sepia"] {
+  color-scheme: light;
+  --bg: #e6dcc2;
+  --chrome: #efe6d0;
+  --paper: #f5ecd7;
+  --ink: #45372a;
+  --muted: #7b6a55;
+  --line: rgb(69 55 42 / 0.16);
+  --accent: #8a5a2b;
+  --shade: rgb(60 40 20 / 0.3);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e0e0d;
+  --chrome: #171614;
+  --paper: #1c1b19;
+  --ink: #e3ded4;
+  --muted: #9b958a;
+  --line: rgb(227 222 212 / 0.12);
+  --accent: #d2a56f;
+  --shade: rgb(0 0 0 / 0.55);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg: #0e0e0d;
+    --chrome: #171614;
+    --paper: #1c1b19;
+    --ink: #e3ded4;
+    --muted: #9b958a;
+    --line: rgb(227 222 212 / 0.12);
+    --accent: #d2a56f;
+    --shade: rgb(0 0 0 / 0.55);
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-chrome: var(--chrome);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-serif: var(--font-reading), Georgia, serif;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Reader pages ---------- */
+
+.page-surface {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.pdf-page-host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pdf-page {
+  position: relative;
+  display: block;
+  line-height: 0;
+}
+
+:root[data-theme="dark"] .reader:not(.original-colors) .pdf-canvas {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .reader:not(.original-colors) .pdf-canvas {
+    filter: invert(1) hue-rotate(180deg);
+  }
+}
+
+:root[data-theme="sepia"] .reader:not(.original-colors) .pdf-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--paper);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+/* Spine shading where two pages meet. */
+.spread-left .page-surface {
+  box-shadow: inset -18px 0 24px -20px var(--shade);
+}
+
+.spread-right .page-surface {
+  box-shadow: inset 18px 0 24px -20px var(--shade);
+}
+
+.leaf {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  transform-style: preserve-3d;
+  z-index: 2;
+  will-change: transform;
+}
+
+.leaf-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.leaf-face.back {
+  transform: rotateY(180deg);
+}
+
+.leaf-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
